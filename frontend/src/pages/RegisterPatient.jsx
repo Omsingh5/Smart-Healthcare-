@@ -2,89 +2,118 @@ import React, { useState } from "react";
 import axiosInstance from "../utils/axiosInstance";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import logoImg from "../assets/logo.png";
 
-const RegisterPatient = () => {
+// ============================================================
+// LOGO SLOT: import logoImg from "../assets/logo.png";
+// Replace the logo div below with: <img src={logoImg} ... />
+// ============================================================
+
+const COLORS = {
+  primary: "#5ba4e5", primaryDark: "#3b82c4",
+  accent: "#4fc3b0", accentDark: "#38a89d",
+  bg: "#f0f7ff", cardBg: "#ffffff",
+  text: "#1e3a5f", muted: "#7a9abf", border: "#d0e4f7",
+  softBlue: "#e8f2fc",
+};
+
+const inputStyle = {
+  width: "100%", background: "#f6f9fd",
+  border: `1.5px solid ${COLORS.border}`,
+  borderRadius: 12, padding: "0.75rem 1rem",
+  fontSize: "0.9rem", color: COLORS.text, outline: "none",
+  transition: "border-color 0.2s", boxSizing: "border-box",
+};
+
+const labelStyle = {
+  display: "block", fontSize: "0.78rem", fontWeight: 600,
+  color: COLORS.muted, textTransform: "uppercase",
+  letterSpacing: "0.08em", marginBottom: 6,
+};
+
+const RegisterPatient = ({ setUser }) => {
   const navigate = useNavigate();
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
       const res = await axiosInstance.post("/api/auth/signup", form);
-      localStorage.setItem("token", res.data.token);
-      toast.success("Registered successfully!");
+      const token = res.data.token;
+      localStorage.setItem("token", token);
+      toast.success("Account created successfully! Welcome.");
+      const profileRes = await axiosInstance.get("/api/auth/me");
+      const user = profileRes.data.user;
+      if (setUser) setUser(user);
       navigate("/patient-dashboard");
-      window.location.reload(); // refresh user state
     } catch (err) {
-      toast.error("Registration failed");
+      toast.error(err.response?.data?.message || "Registration failed. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div
-      style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
-      className="min-h-screen flex items-center justify-center bg-[#0a0f1e] text-white px-6 py-12 relative overflow-hidden"
-    >
-      <div className="absolute top-[-10%] right-[-5%] w-96 h-96 bg-teal-500/10 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] left-[-5%] w-80 h-80 bg-blue-600/10 rounded-full blur-[100px] pointer-events-none" />
-
-      <div className="relative z-10 w-full max-w-md">
-        <div className="flex items-center gap-2 mb-10 justify-center">
-          <div className="w-8 h-8 rounded-lg bg-teal-400 flex items-center justify-center text-[#0a0f1e] font-black text-lg">
-            +
-          </div>
-          <span className="font-bold text-lg">SmartHealth</span>
+    <div style={{
+      minHeight: "100vh", background: COLORS.bg,
+      fontFamily: "'Segoe UI', system-ui, sans-serif",
+      display: "flex", flexDirection: "column",
+    }}>
+      {/* Header */}
+      <header style={{
+        padding: "1.1rem 2rem", display: "flex", alignItems: "center",
+        background: "white", borderBottom: `1px solid ${COLORS.border}`,
+        boxShadow: "0 2px 8px rgba(91,164,229,0.07)",
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          {/* LOGO */}
+          <img src={logoImg} alt="Smart Health Care" style={{ height: 40, width: 40, objectFit: "contain", borderRadius: 8 }} />
+          <span style={{ fontWeight: 800, fontSize: "1.1rem", color: COLORS.text }}>Smart Health Care</span>
         </div>
+      </header>
 
-        <div className="bg-white/5 border border-white/10 rounded-3xl p-8">
-          <div className="text-center mb-8">
-            <div className="text-4xl mb-3">🧑‍⚕️</div>
-            <h2 className="text-2xl font-black">Patient Registration</h2>
-            <p className="text-white/40 text-sm mt-1">
-              Create your health account
+      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "2rem 1rem" }}>
+        <div style={{
+          width: "100%", maxWidth: 440,
+          background: COLORS.cardBg, borderRadius: 24,
+          padding: "2.5rem",
+          boxShadow: "0 8px 40px rgba(91,164,229,0.12)",
+          border: `1px solid ${COLORS.border}`,
+        }}>
+          <div style={{ textAlign: "center", marginBottom: "2rem" }}>
+            <div style={{
+              width: 72, height: 72, borderRadius: 20, margin: "0 auto 1rem",
+              background: "linear-gradient(135deg,#5ba4e5,#4fc3b0)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: "2rem", boxShadow: "0 6px 16px rgba(91,164,229,0.3)",
+            }}>🧑‍⚕️</div>
+            <h1 style={{ fontSize: "1.6rem", fontWeight: 900, color: COLORS.text, marginBottom: 4 }}>
+              Patient Registration
+            </h1>
+            <p style={{ color: COLORS.muted, fontSize: "0.875rem" }}>
+              Create your health account today
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             {[
-              {
-                label: "Full Name",
-                name: "name",
-                type: "text",
-                placeholder: "John Doe",
-              },
-              {
-                label: "Email Address",
-                name: "email",
-                type: "email",
-                placeholder: "you@example.com",
-              },
-              {
-                label: "Password",
-                name: "password",
-                type: "password",
-                placeholder: "••••••••",
-              },
+              { label: "Full Name", name: "name", type: "text", placeholder: "John Doe" },
+              { label: "Email Address", name: "email", type: "email", placeholder: "you@example.com" },
+              { label: "Password", name: "password", type: "password", placeholder: "••••••••" },
             ].map(({ label, name, type, placeholder }) => (
               <div key={name}>
-                <label className="block text-xs text-white/50 uppercase tracking-widest mb-2">
-                  {label}
-                </label>
+                <label style={labelStyle}>{label}</label>
                 <input
-                  type={type}
-                  name={name}
-                  placeholder={placeholder}
-                  value={form[name]}
-                  onChange={handleChange}
-                  required
-                  className="w-full bg-white/5 border border-white/10 focus:border-teal-500 outline-none rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 transition-colors"
+                  type={type} name={name} placeholder={placeholder}
+                  value={form[name]} onChange={handleChange}
+                  required minLength={name === "password" ? 6 : undefined}
+                  style={inputStyle}
+                  onFocus={(e) => e.target.style.borderColor = COLORS.primary}
+                  onBlur={(e) => e.target.style.borderColor = COLORS.border}
                 />
               </div>
             ))}
@@ -92,26 +121,27 @@ const RegisterPatient = () => {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full py-3.5 rounded-xl font-bold text-sm mt-2 transition-all duration-300 ${
-                loading
-                  ? "bg-white/10 text-white/30 cursor-not-allowed"
-                  : "bg-teal-500 hover:bg-teal-400 text-[#0a0f1e] hover:shadow-[0_0_30px_rgba(20,184,166,0.4)]"
-              }`}
+              style={{
+                width: "100%",
+                background: loading ? "#c7dff7" : "linear-gradient(135deg,#5ba4e5,#4fc3b0)",
+                color: "white", border: "none", borderRadius: 12,
+                padding: "0.9rem", fontWeight: 700, fontSize: "0.95rem",
+                cursor: loading ? "not-allowed" : "pointer",
+                boxShadow: loading ? "none" : "0 4px 14px rgba(91,164,229,0.35)",
+                marginTop: 4,
+              }}
             >
               {loading ? "Creating account..." : "Create Account →"}
             </button>
           </form>
 
-          <div className="mt-6 pt-6 border-t border-white/5 text-center">
-            <p className="text-xs text-white/30">
-              Already have an account?{" "}
-              <span
-                onClick={() => navigate("/")}
-                className="text-teal-400 cursor-pointer hover:underline"
-              >
-                Sign in here
-              </span>
-            </p>
+          <div style={{ marginTop: "1.5rem", textAlign: "center" }}>
+            <button
+              onClick={() => navigate("/")}
+              style={{ background: "none", border: "none", color: COLORS.muted, fontSize: "0.85rem", cursor: "pointer" }}
+            >
+              ← Already have an account? Sign in
+            </button>
           </div>
         </div>
       </div>

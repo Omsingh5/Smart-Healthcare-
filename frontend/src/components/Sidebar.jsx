@@ -1,6 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import axiosInstance from "../utils/axiosInstance";
+import logoImg from "../assets/logo.png";
+
+const COLORS = {
+  primary: "#5ba4e5",
+  accent: "#4fc3b0",
+  text: "#1e3a5f",
+  muted: "#7a9abf",
+  sidebar: "#ffffff",
+  sidebarBorder: "#d0e4f7",
+  activeBackground: "#e8f2fc",
+  activeBorder: "#5ba4e5",
+  activeText: "#3b82c4",
+  hoverBg: "#f0f7ff",
+  bg: "#f0f7ff",
+};
 
 const Sidebar = ({ children, onLogout }) => {
   const location = useLocation();
@@ -27,98 +42,171 @@ const Sidebar = ({ children, onLogout }) => {
     ? [
         { path: "/doctor-dashboard", icon: "🗓️", label: "Appointments" },
         { path: "/beds-availability", icon: "🛏️", label: "Beds Availability" },
-        { path: "/profile", icon: "👤", label: "Profile" },
+        { path: "/profile", icon: "👤", label: "My Profile" },
       ]
     : [
         { path: "/patient-dashboard", icon: "🏠", label: "Dashboard" },
         { path: "/view-beds", icon: "🛏️", label: "View Beds" },
-        { path: "/profile", icon: "👤", label: "Profile" },
+        { path: "/profile", icon: "👤", label: "My Profile" },
       ];
 
   return (
     <div
-      className="flex min-h-screen"
       style={{
+        display: "flex",
+        minHeight: "100vh",
         fontFamily: "'Segoe UI', system-ui, sans-serif",
-        background: "#0a0f1e",
+        background: COLORS.bg,
       }}
     >
       {/* Sidebar */}
       <div
-        className={`flex flex-col justify-between border-r transition-all duration-300 ${collapsed ? "w-16" : "w-60"}`}
         style={{
-          background: "#0d1321",
-          borderColor: "rgba(255,255,255,0.06)",
+          width: collapsed ? 64 : 240,
           minHeight: "100vh",
+          background: COLORS.sidebar,
+          borderRight: `1px solid ${COLORS.sidebarBorder}`,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          transition: "width 0.25s ease",
+          flexShrink: 0,
+          boxShadow: "2px 0 12px rgba(91,164,229,0.07)",
         }}
       >
         {/* Top */}
         <div>
-          {/* Logo */}
+          {/* Logo Container */}
           <div
-            className={`flex items-center gap-2 p-5 border-b ${collapsed ? "justify-center" : ""}`}
-            style={{ borderColor: "rgba(255,255,255,0.06)" }}
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: collapsed ? 0 : 10,
+              padding: collapsed ? "1.2rem 0" : "1.2rem 1.2rem",
+              justifyContent: "center",
+              borderBottom: `1px solid ${COLORS.sidebarBorder}`,
+            }}
           >
-            <div
-              className="w-8 h-8 rounded-lg flex items-center justify-center font-black text-lg flex-shrink-0"
-              style={{ background: "#2dd4bf", color: "#0a0f1e" }}
-            >
-              +
-            </div>
+            {/* LOGO */}
+            <img
+              src={logoImg}
+              alt="Smart Health Care"
+              style={{
+                width: 200,
+                height: 100,
+                objectFit: "contain",
+                borderRadius: 8,
+                flexShrink: 0,
+              }}
+            />
             {!collapsed && (
-              <span className="font-bold text-white text-sm">SmartHealth</span>
+              <span
+                style={{
+                  fontWeight: 800,
+                  fontSize: "1.1rem",
+                  color: COLORS.text,
+                  whiteSpace: "nowrap",
+                  textAlign: "center",
+                }}
+              >
+                Smart Health Care
+              </span>
             )}
           </div>
 
-          {/* User info */}
+          {/* User info chip */}
           {!collapsed && userName && (
             <div
-              className="px-4 py-3 mx-3 mt-3 rounded-xl"
               style={{
-                background: "rgba(45,212,191,0.08)",
-                border: "1px solid rgba(45,212,191,0.15)",
+                margin: "12px 12px 0",
+                padding: "0.65rem 0.9rem",
+                background: "linear-gradient(135deg,#e8f2fc,#e8faf7)",
+                borderRadius: 12,
+                border: `1px solid ${COLORS.sidebarBorder}`,
               }}
             >
-              <p className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>
+              <p
+                style={{
+                  fontSize: "0.7rem",
+                  color: COLORS.muted,
+                  marginBottom: 2,
+                }}
+              >
                 Logged in as
               </p>
-              <p className="text-sm font-semibold text-white truncate">
+              <p
+                style={{
+                  fontSize: "0.88rem",
+                  fontWeight: 700,
+                  color: COLORS.text,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+              >
                 {userName}
               </p>
-              <p className="text-xs" style={{ color: "#2dd4bf" }}>
-                {isDoctor ? "Doctor" : "Patient"}
+              <p
+                style={{
+                  fontSize: "0.72rem",
+                  fontWeight: 600,
+                  color: isDoctor ? COLORS.accent : COLORS.primary,
+                  marginTop: 1,
+                }}
+              >
+                {isDoctor ? "🩺 Doctor" : "🧑 Patient"}
               </p>
             </div>
           )}
 
-          {/* Nav Links */}
-          <nav className="mt-4 px-3 flex flex-col gap-1">
+          {/* Nav */}
+          <nav
+            style={{
+              marginTop: 12,
+              padding: "0 8px",
+              display: "flex",
+              flexDirection: "column",
+              gap: 4,
+            }}
+          >
             {navItems.map(({ path, icon, label }) => (
               <Link
                 key={path}
                 to={path}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 ${collapsed ? "justify-center" : ""}`}
-                style={
-                  isActive(path)
-                    ? {
-                        background: "rgba(45,212,191,0.15)",
-                        color: "#2dd4bf",
-                        border: "1px solid rgba(45,212,191,0.25)",
-                      }
-                    : {
-                        color: "rgba(255,255,255,0.5)",
-                        border: "1px solid transparent",
-                      }
-                }
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: collapsed ? 0 : 10,
+                  padding: "0.65rem 0.85rem",
+                  justifyContent: collapsed ? "center" : "flex-start",
+                  borderRadius: 12,
+                  textDecoration: "none",
+                  background: isActive(path)
+                    ? COLORS.activeBackground
+                    : "transparent",
+                  color: isActive(path) ? COLORS.activeText : COLORS.muted,
+                  fontWeight: isActive(path) ? 700 : 500,
+                  fontSize: "0.875rem",
+                  border: isActive(path)
+                    ? `1px solid ${COLORS.activeBorder}40`
+                    : "1px solid transparent",
+                  transition: "all 0.15s",
+                }}
                 onMouseEnter={(e) => {
-                  if (!isActive(path)) e.currentTarget.style.color = "white";
+                  if (!isActive(path)) {
+                    e.currentTarget.style.background = COLORS.hoverBg;
+                    e.currentTarget.style.color = COLORS.text;
+                  }
                 }}
                 onMouseLeave={(e) => {
-                  if (!isActive(path))
-                    e.currentTarget.style.color = "rgba(255,255,255,0.5)";
+                  if (!isActive(path)) {
+                    e.currentTarget.style.background = "transparent";
+                    e.currentTarget.style.color = COLORS.muted;
+                  }
                 }}
               >
-                <span className="text-base">{icon}</span>
+                <span style={{ fontSize: "1.1rem" }}>{icon}</span>
                 {!collapsed && <span>{label}</span>}
               </Link>
             ))}
@@ -126,34 +214,69 @@ const Sidebar = ({ children, onLogout }) => {
         </div>
 
         {/* Bottom */}
-        <div className="px-3 pb-5 flex flex-col gap-2">
+        <div
+          style={{
+            padding: "0 8px 16px",
+            display: "flex",
+            flexDirection: "column",
+            gap: 4,
+          }}
+        >
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm w-full transition-all"
             style={{
-              color: "rgba(255,255,255,0.3)",
+              display: "flex",
+              alignItems: "center",
+              gap: collapsed ? 0 : 10,
+              padding: "0.65rem 0.85rem",
+              justifyContent: collapsed ? "center" : "flex-start",
+              borderRadius: 12,
+              background: "none",
               border: "1px solid transparent",
+              cursor: "pointer",
+              color: COLORS.muted,
+              fontSize: "0.875rem",
+              width: "100%",
+              transition: "all 0.15s",
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "white")}
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.color = "rgba(255,255,255,0.3)")
-            }
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = COLORS.hoverBg;
+              e.currentTarget.style.color = COLORS.text;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "none";
+              e.currentTarget.style.color = COLORS.muted;
+            }}
           >
             <span>{collapsed ? "→" : "←"}</span>
             {!collapsed && <span>Collapse</span>}
           </button>
+
           {onLogout && (
             <button
               onClick={onLogout}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm w-full transition-all ${collapsed ? "justify-center" : ""}`}
-              style={{ color: "#f87171", border: "1px solid transparent" }}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: collapsed ? 0 : 10,
+                padding: "0.65rem 0.85rem",
+                justifyContent: collapsed ? "center" : "flex-start",
+                borderRadius: 12,
+                background: "none",
+                border: "1px solid transparent",
+                cursor: "pointer",
+                color: "#e05252",
+                fontSize: "0.875rem",
+                fontWeight: 600,
+                width: "100%",
+                transition: "all 0.15s",
+              }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = "rgba(248,113,113,0.1)";
-                e.currentTarget.style.border =
-                  "1px solid rgba(248,113,113,0.2)";
+                e.currentTarget.style.background = "#fde8e8";
+                e.currentTarget.style.border = "1px solid #f5c6c6";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = "transparent";
+                e.currentTarget.style.background = "none";
                 e.currentTarget.style.border = "1px solid transparent";
               }}
             >
@@ -165,7 +288,7 @@ const Sidebar = ({ children, onLogout }) => {
       </div>
 
       {/* Main content */}
-      <div className="flex-1 overflow-auto" style={{ background: "#0a0f1e" }}>
+      <div style={{ flex: 1, overflow: "auto", background: COLORS.bg }}>
         {children}
       </div>
     </div>

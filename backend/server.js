@@ -89,7 +89,8 @@ const appointmentSchema = new mongoose.Schema({
   otherCharges: { type: Number, default: 0 },
   totalAmount: { type: Number },
   paymentStatus: { type: String, default: 'unpaid', enum: ['unpaid', 'paid', 'partial'] },
-  paymentTime: Date
+  paymentTime: Date,
+  razorpayPaymentId: { type: String, default: '' }
 });
 
 const recordSchema = new mongoose.Schema({
@@ -159,9 +160,9 @@ app.post('/api/auth/signup', async (req, res) => {
     if (existing) return res.status(409).json({ message: 'Email already registered' });
 
     const hashed = await bcrypt.hash(password, 12);
-    await User.create({ name, email, password: hashed, specialization });
-
-    res.status(201).json({ message: 'User created successfully' });
+    const newUser = await User.create({ name, email, password: hashed, specialization });
+    const token = jwt.sign({ id: newUser._id, role: newUser.specialization ? 'doctor' : 'patient' }, process.env.JWT_SECRET, { expiresIn: '1d' });
+    res.status(201).json({ message: 'User created successfully', token });
   } catch (err) {
     res.status(500).json({ message: 'Signup failed', error: err.message });
   }
@@ -208,6 +209,8 @@ app.get("/api/auth/doctors", async (req, res) => {
 
 // Appointment Routes
 app.post("/appointments", authenticateToken, async (req, res) => {
+// also handle /api/appointments
+
   try {
     if (req.user.specialization) {
       return res.status(403).json({ message: "Only patients can book appointments" });
@@ -229,6 +232,32 @@ app.post("/appointments", authenticateToken, async (req, res) => {
     const io = req.app.get("io");
     io.emit("appointmentUpdated", appointment);
 
+    res.status(201).json({ success: true, appointment });
+  } catch (err) {
+    res.status(500).json({ message: "Appointment creation failed", error: err.message });
+  }
+});
+
+
+// Alias: /api/appointments -> same as /appointments
+app.post("/api/appointments", authenticateToken, async (req, res) => {
+  try {
+    if (req.user.specialization) {
+      return res.status(403).json({ message: "Only patients can book appointments" });
+    }
+    const { doctor_id, date, time, notes } = req.body;
+    const appointment = await Appointment.create({
+      doctor_id,
+      patient_id: req.user._id,
+      patientName: req.user.name,
+      patientAge: req.user.age || "",
+      patientContact: req.user.contact || "",
+      date,
+      time,
+      notes
+    });
+    const io = req.app.get("io");
+    io.emit("appointmentUpdated", appointment);
     res.status(201).json({ success: true, appointment });
   } catch (err) {
     res.status(500).json({ message: "Appointment creation failed", error: err.message });
@@ -273,8 +302,17 @@ app.put("/api/doctor/appointments/:id", authenticateToken, async (req, res) => {
 
 app.get("/api/doctor/appointments", authenticateToken, async (req, res) => {
   try {
-    const appointments = await Appointment.find({ doctor_id: req.user._id });
-    res.json({ appointments });
+    const appointments = await Appointment.find({ doctor_id: req.user._id })
+      .populate("patient_id", "name age contact")
+      .sort({ date: -1 });
+    // Enrich with doctor fee for billing
+    const formatted = appointments.map(a => ({
+      ...a._doc,
+      doctorFee: req.user.fee || 500,
+      patientAge: a.patientAge || a.patient_id?.age || "",
+      patientContact: a.patientContact || a.patient_id?.contact || "",
+    }));
+    res.json({ appointments: formatted });
   } catch (err) {
     res.status(500).json({ message: 'Failed to fetch appointments' });
   }
@@ -338,6 +376,17 @@ app.get("/api/rooms", authenticateToken, isDoctor, async (req, res) => {
     res.json({ success: true, rooms });
   } catch (err) {
     res.status(500).json({ message: "Failed to fetch rooms", error: err.message });
+  }
+});
+
+
+// GET /api/rooms/doctor/:doctorId - Patient views a specific doctor's rooms/beds
+app.get("/api/rooms/doctor/:doctorId", authenticateToken, async (req, res) => {
+  try {
+    const rooms = await Room.find({ doctor_id: req.params.doctorId }).select("number beds");
+    res.json({ success: true, rooms });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch doctor rooms", error: err.message });
   }
 });
 
@@ -472,16 +521,33 @@ app.get("/api/invoice/:id", authenticateToken, async (req, res) => {
 app.post("/api/payment/create-order", authenticateToken, async (req, res) => {
   try {
     const { appointmentId } = req.body;
+
+    if (!appointmentId) {
+      return res.status(400).json({ message: "appointmentId is required" });
+    }
+
     const appointment = await Appointment.findById(appointmentId);
 
-    if (!appointment || appointment.paymentStatus === "paid") {
-      return res.status(400).json({ message: "Invalid or already paid" });
+    if (!appointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    if (appointment.paymentStatus === "paid") {
+      return res.status(400).json({ message: "Already paid" });
+    }
+
+    if (!appointment.totalAmount || appointment.totalAmount <= 0) {
+      return res.status(400).json({ message: "No bill generated yet. Doctor must mark checked-up first." });
     }
 
     const options = {
-      amount: appointment.totalAmount * 100, // ₹ to paisa
+      amount: Math.round(appointment.totalAmount * 100), // ₹ to paise, must be integer
       currency: "INR",
-      receipt: `receipt_${appointment._id}`,
+      receipt: `rcpt_${appointment._id.toString().slice(-8)}`,
+      notes: {
+        appointmentId: appointment._id.toString(),
+        patientName: appointment.patientName,
+      }
     };
 
     const order = await razorpay.orders.create(options);
@@ -490,11 +556,11 @@ app.post("/api/payment/create-order", authenticateToken, async (req, res) => {
       success: true,
       key: process.env.RAZORPAY_KEY_ID,
       order,
-      appointmentId,
+      appointmentId: appointment._id,
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Order creation failed" });
+    console.error("Razorpay order error:", err);
+    res.status(500).json({ message: "Payment order creation failed", error: err.message });
   }
 });
 
@@ -502,19 +568,26 @@ app.post("/api/payment/create-order", authenticateToken, async (req, res) => {
 app.put("/api/patient/payment-success/:id", authenticateToken, async (req, res) => {
   try {
     const appointment = await Appointment.findById(req.params.id);
-    if (!appointment) return res.status(404).json({ message: "Not found" });
+    if (!appointment) return res.status(404).json({ message: "Appointment not found" });
+
+    if (appointment.paymentStatus === "paid") {
+      return res.json({ success: true, message: "Already marked as paid" });
+    }
 
     appointment.paymentStatus = "paid";
     appointment.paymentTime = new Date();
+    if (req.body.paymentId) appointment.razorpayPaymentId = req.body.paymentId;
+
     await appointment.save();
 
-    // Emit the payment update via Socket.io
+    // Emit real-time update to all connected clients
     const io = req.app.get("io");
     io.emit("paymentUpdated", appointment);
 
-    res.json({ success: true, message: "Payment marked as paid" });
+    res.json({ success: true, message: "Payment confirmed", appointment });
   } catch (err) {
-    res.status(500).json({ message: "Update failed", error: err.message });
+    console.error("Payment success update error:", err);
+    res.status(500).json({ message: "Payment status update failed", error: err.message });
   }
 });
 

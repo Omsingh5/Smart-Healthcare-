@@ -17,38 +17,38 @@ const socket = io("http://localhost:5000");
 const S = {
   page: {
     fontFamily: "'Segoe UI', system-ui, sans-serif",
-    color: "white",
+    color: "#1e3a5f",
     minHeight: "100vh",
     padding: "2rem",
-    background: "#0a0f1e",
+    background: "#f0f7ff",
   },
   card: {
-    background: "rgba(255,255,255,0.04)",
-    border: "1px solid rgba(255,255,255,0.08)",
+    background: "#ffffff",
+    border: "1px solid rgba(91,164,229,0.15)",
     borderRadius: "1.25rem",
     padding: "1.5rem",
   },
   input: {
     width: "100%",
-    background: "rgba(255,255,255,0.05)",
-    border: "1px solid rgba(255,255,255,0.1)",
+    background: "#f6f9fd",
+    border: "1px solid rgba(91,164,229,0.2)",
     borderRadius: "0.75rem",
     padding: "0.75rem 1rem",
-    color: "white",
+    color: "#1e3a5f",
     fontSize: "0.875rem",
     outline: "none",
   },
   label: {
     display: "block",
     fontSize: "0.7rem",
-    color: "rgba(255,255,255,0.4)",
+    color: "#7a9abf",
     textTransform: "uppercase",
     letterSpacing: "0.1em",
     marginBottom: "0.4rem",
   },
   btnPrimary: {
     background: "#2dd4bf",
-    color: "#0a0f1e",
+    color: "#f0f7ff",
     border: "none",
     borderRadius: "0.75rem",
     padding: "0.75rem 1.5rem",
@@ -57,9 +57,9 @@ const S = {
     cursor: "pointer",
   },
   btnSecondary: {
-    background: "rgba(255,255,255,0.06)",
-    color: "white",
-    border: "1px solid rgba(255,255,255,0.1)",
+    background: "#f0f7ff",
+    color: "#1e3a5f",
+    border: "1px solid rgba(91,164,229,0.2)",
     borderRadius: "0.75rem",
     padding: "0.5rem 1rem",
     fontSize: "0.8rem",
@@ -116,7 +116,7 @@ const PatientDashboard = ({ onLogout }) => {
     if (!form.doctor_id || !form.date || !form.time || !form.notes)
       return toast.error("All fields required");
     try {
-      await axiosInstance.post("/appointments", form);
+      await axiosInstance.post("/api/appointments", form);
       toast.success("Appointment booked");
       setForm({ doctor_id: "", date: "", time: "", notes: "" });
       fetchData();
@@ -135,7 +135,7 @@ const PatientDashboard = ({ onLogout }) => {
         key,
         amount: order.amount,
         currency: order.currency,
-        name: "Smart Healthcare",
+        name: "Smart Health Care",
         description: "Appointment Bill",
         order_id: order.id,
         handler: async function (response) {
@@ -193,13 +193,13 @@ const PatientDashboard = ({ onLogout }) => {
             style={{
               fontSize: "1.75rem",
               fontWeight: "900",
-              color: "white",
+              color: "#1e3a5f",
               marginBottom: "0.25rem",
             }}
           >
             Patient Portal
           </h1>
-          <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.875rem" }}>
+          <p style={{ color: "#7a9abf", fontSize: "0.875rem" }}>
             Manage your appointments and health records
           </p>
         </div>
@@ -236,7 +236,7 @@ const PatientDashboard = ({ onLogout }) => {
               <div
                 style={{
                   fontSize: "0.75rem",
-                  color: "rgba(255,255,255,0.4)",
+                  color: "#7a9abf",
                   marginTop: "0.25rem",
                 }}
               >
@@ -269,14 +269,14 @@ const PatientDashboard = ({ onLogout }) => {
                     setForm({ ...form, doctor_id: e.target.value })
                   }
                 >
-                  <option value="" style={{ background: "#0a0f1e" }}>
+                  <option value="" style={{ background: "#f0f7ff" }}>
                     Select Doctor
                   </option>
                   {doctors.map((doc) => (
                     <option
                       key={doc._id}
                       value={doc._id}
-                      style={{ background: "#0a0f1e" }}
+                      style={{ background: "#f0f7ff" }}
                     >
                       {doc.name}
                     </option>
@@ -287,7 +287,7 @@ const PatientDashboard = ({ onLogout }) => {
                 <label style={S.label}>Date</label>
                 <input
                   type="date"
-                  style={{ ...S.input, colorScheme: "dark" }}
+                  style={{ ...S.input, colorScheme: "light" }}
                   value={form.date}
                   onChange={(e) => setForm({ ...form, date: e.target.value })}
                 />
@@ -296,7 +296,7 @@ const PatientDashboard = ({ onLogout }) => {
                 <label style={S.label}>Time</label>
                 <input
                   type="time"
-                  style={{ ...S.input, colorScheme: "dark" }}
+                  style={{ ...S.input, colorScheme: "light" }}
                   value={form.time}
                   onChange={(e) => setForm({ ...form, time: e.target.value })}
                 />
@@ -325,7 +325,7 @@ const PatientDashboard = ({ onLogout }) => {
               fontWeight: "800",
               fontSize: "1rem",
               marginBottom: "1rem",
-              color: "white",
+              color: "#1e3a5f",
             }}
           >
             🗓️ Upcoming Appointments
@@ -335,7 +335,7 @@ const PatientDashboard = ({ onLogout }) => {
               style={{
                 ...S.card,
                 textAlign: "center",
-                color: "rgba(255,255,255,0.3)",
+                color: "#7a9abf",
               }}
             >
               Loading...
@@ -345,7 +345,7 @@ const PatientDashboard = ({ onLogout }) => {
               style={{
                 ...S.card,
                 textAlign: "center",
-                color: "rgba(255,255,255,0.3)",
+                color: "#7a9abf",
                 padding: "2.5rem",
               }}
             >
@@ -366,7 +366,7 @@ const PatientDashboard = ({ onLogout }) => {
                     <p
                       style={{
                         fontSize: "0.8rem",
-                        color: "rgba(255,255,255,0.4)",
+                        color: "#7a9abf",
                       }}
                     >
                       {new Date(a.date).toLocaleDateString()} at {a.time}
@@ -374,7 +374,7 @@ const PatientDashboard = ({ onLogout }) => {
                     <p
                       style={{
                         fontSize: "0.8rem",
-                        color: "rgba(255,255,255,0.5)",
+                        color: "#7a9abf",
                         marginTop: "0.25rem",
                       }}
                     >
@@ -395,7 +395,7 @@ const PatientDashboard = ({ onLogout }) => {
               fontWeight: "800",
               fontSize: "1rem",
               marginBottom: "1rem",
-              color: "white",
+              color: "#1e3a5f",
             }}
           >
             📋 Appointment History
@@ -405,7 +405,7 @@ const PatientDashboard = ({ onLogout }) => {
               style={{
                 ...S.card,
                 textAlign: "center",
-                color: "rgba(255,255,255,0.3)",
+                color: "#7a9abf",
                 padding: "2.5rem",
               }}
             >
@@ -423,7 +423,7 @@ const PatientDashboard = ({ onLogout }) => {
                       <p
                         style={{
                           fontSize: "0.8rem",
-                          color: "rgba(255,255,255,0.4)",
+                          color: "#7a9abf",
                         }}
                       >
                         {new Date(a.date).toLocaleDateString()} at {a.time}
@@ -431,7 +431,7 @@ const PatientDashboard = ({ onLogout }) => {
                       <p
                         style={{
                           fontSize: "0.8rem",
-                          color: "rgba(255,255,255,0.5)",
+                          color: "#7a9abf",
                           marginTop: "0.25rem",
                         }}
                       >
@@ -451,13 +451,30 @@ const PatientDashboard = ({ onLogout }) => {
                             Total: ₹{a.totalAmount} · Payment: {a.paymentStatus}
                           </p>
                           <div className="flex gap-2 mt-2 flex-wrap">
-                            <a
-                              href={`/api/invoice/${a._id}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
+                            <button
+                              style={S.btnSecondary}
+                              onClick={async () => {
+                                try {
+                                  const token = localStorage.getItem("token");
+                                  const response = await fetch(
+                                    `http://localhost:5000/api/invoice/${a._id}`,
+                                    { headers: { Authorization: `Bearer ${token}` } }
+                                  );
+                                  if (!response.ok) throw new Error("Failed");
+                                  const blob = await response.blob();
+                                  const url = window.URL.createObjectURL(blob);
+                                  const link = document.createElement("a");
+                                  link.href = url;
+                                  link.download = `invoice-${a._id}.pdf`;
+                                  link.click();
+                                  window.URL.revokeObjectURL(url);
+                                } catch {
+                                  toast.error("Could not download invoice");
+                                }
+                              }}
                             >
-                              <button style={S.btnSecondary}>📄 Invoice</button>
-                            </a>
+                              📄 Download Invoice
+                            </button>
                             {a.paymentStatus === "unpaid" && (
                               <button
                                 onClick={() => handlePayment(a)}

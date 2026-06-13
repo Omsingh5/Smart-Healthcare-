@@ -11,23 +11,23 @@ const socket = io("http://localhost:5000");
 const S = {
   page: {
     fontFamily: "'Segoe UI', system-ui, sans-serif",
-    color: "white",
+    color: "#1e3a5f",
     minHeight: "100vh",
     padding: "2rem",
-    background: "#0a0f1e",
+    background: "#f0f7ff",
   },
   card: {
-    background: "rgba(255,255,255,0.04)",
-    border: "1px solid rgba(255,255,255,0.08)",
+    background: "#ffffff",
+    border: "1px solid rgba(91,164,229,0.15)",
     borderRadius: "1.25rem",
     padding: "1.5rem",
   },
   input: {
-    background: "rgba(255,255,255,0.05)",
-    border: "1px solid rgba(255,255,255,0.1)",
+    background: "#f6f9fd",
+    border: "1px solid rgba(91,164,229,0.2)",
     borderRadius: "0.75rem",
     padding: "0.6rem 1rem",
-    color: "white",
+    color: "#1e3a5f",
     fontSize: "0.875rem",
     outline: "none",
   },
@@ -63,6 +63,7 @@ const DoctorDashboard = ({ onLogout }) => {
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [otherCharges, setOtherCharges] = useState(0);
   const [showBillingModal, setShowBillingModal] = useState(false);
+  const [doctorFee, setDoctorFee] = useState(500);
   const itemsPerPage = 8;
 
   useEffect(() => {
@@ -81,6 +82,10 @@ const DoctorDashboard = ({ onLogout }) => {
 
   useEffect(() => {
     fetchAppointments();
+    // Fetch the doctor's own fee
+    axiosInstance.get("/api/auth/me").then(res => {
+      setDoctorFee(res.data.user?.fee || 500);
+    }).catch(() => {});
   }, []);
 
   const fetchAppointments = async () => {
@@ -110,7 +115,7 @@ const DoctorDashboard = ({ onLogout }) => {
   const handleGenerateBill = async (appointmentId) => {
     try {
       const response = await axiosInstance.get(
-        `/api/invoice/${appointmentId}`,
+        `http://localhost:5000/api/invoice/${appointmentId}`,
         { responseType: "blob" },
       );
       const link = document.createElement("a");
@@ -166,13 +171,13 @@ const DoctorDashboard = ({ onLogout }) => {
             style={{
               fontSize: "1.75rem",
               fontWeight: "900",
-              color: "white",
+              color: "#1e3a5f",
               marginBottom: "0.25rem",
             }}
           >
             Appointments
           </h1>
-          <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.875rem" }}>
+          <p style={{ color: "#7a9abf", fontSize: "0.875rem" }}>
             Manage and review patient appointments
           </p>
         </div>
@@ -190,11 +195,11 @@ const DoctorDashboard = ({ onLogout }) => {
                 border:
                   statusFilter === key
                     ? "1px solid rgba(45,212,191,0.4)"
-                    : "1px solid rgba(255,255,255,0.08)",
+                    : "1px solid rgba(91,164,229,0.15)",
                 background:
                   statusFilter === key
                     ? "rgba(45,212,191,0.08)"
-                    : "rgba(255,255,255,0.04)",
+                    : "#ffffff",
                 transition: "all 0.2s",
                 textAlign: "left",
               }}
@@ -203,7 +208,7 @@ const DoctorDashboard = ({ onLogout }) => {
                 style={{
                   fontSize: "1.5rem",
                   fontWeight: "900",
-                  color: statusFilter === key ? "#2dd4bf" : "white",
+                  color: statusFilter === key ? "#2dd4bf" : "#1e3a5f",
                 }}
               >
                 {val}
@@ -211,7 +216,7 @@ const DoctorDashboard = ({ onLogout }) => {
               <div
                 style={{
                   fontSize: "0.7rem",
-                  color: "rgba(255,255,255,0.4)",
+                  color: "#7a9abf",
                   textTransform: "capitalize",
                   marginTop: "0.2rem",
                 }}
@@ -234,13 +239,13 @@ const DoctorDashboard = ({ onLogout }) => {
             />
             <input
               type="date"
-              style={{ ...S.input, colorScheme: "dark" }}
+              style={{ ...S.input, colorScheme: "light" }}
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
             />
             <input
               type="date"
-              style={{ ...S.input, colorScheme: "dark" }}
+              style={{ ...S.input, colorScheme: "light" }}
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
             />
@@ -251,7 +256,7 @@ const DoctorDashboard = ({ onLogout }) => {
         <div style={{ ...S.card, padding: 0, overflow: "hidden" }}>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
-              <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+              <tr style={{ borderBottom: "1px solid rgba(91,164,229,0.15)" }}>
                 {["Patient", "Date", "Time", "Status", "Actions"].map((h) => (
                   <th
                     key={h}
@@ -259,7 +264,7 @@ const DoctorDashboard = ({ onLogout }) => {
                       padding: "1rem 1.25rem",
                       textAlign: "left",
                       fontSize: "0.7rem",
-                      color: "rgba(255,255,255,0.4)",
+                      color: "#7a9abf",
                       textTransform: "uppercase",
                       letterSpacing: "0.08em",
                       fontWeight: "600",
@@ -278,7 +283,7 @@ const DoctorDashboard = ({ onLogout }) => {
                     style={{
                       padding: "3rem",
                       textAlign: "center",
-                      color: "rgba(255,255,255,0.3)",
+                      color: "#7a9abf",
                     }}
                   >
                     Loading...
@@ -291,7 +296,7 @@ const DoctorDashboard = ({ onLogout }) => {
                     style={{
                       padding: "3rem",
                       textAlign: "center",
-                      color: "rgba(255,255,255,0.3)",
+                      color: "#7a9abf",
                     }}
                   >
                     No appointments found
@@ -302,9 +307,9 @@ const DoctorDashboard = ({ onLogout }) => {
                   <tr
                     key={a._id}
                     style={{
-                      borderBottom: "1px solid rgba(255,255,255,0.05)",
+                      borderBottom: "1px solid rgba(91,164,229,0.08)",
                       background:
-                        i % 2 === 0 ? "transparent" : "rgba(255,255,255,0.01)",
+                        i % 2 === 0 ? "transparent" : "#fafcff",
                       transition: "background 0.15s",
                     }}
                     onMouseEnter={(e) =>
@@ -313,7 +318,7 @@ const DoctorDashboard = ({ onLogout }) => {
                     }
                     onMouseLeave={(e) =>
                       (e.currentTarget.style.background =
-                        i % 2 === 0 ? "transparent" : "rgba(255,255,255,0.01)")
+                        i % 2 === 0 ? "transparent" : "#fafcff")
                     }
                   >
                     <td
@@ -329,7 +334,7 @@ const DoctorDashboard = ({ onLogout }) => {
                       style={{
                         padding: "0.9rem 1.25rem",
                         fontSize: "0.8rem",
-                        color: "rgba(255,255,255,0.6)",
+                        color: "#7a9abf",
                       }}
                     >
                       {new Date(a.date).toDateString()}
@@ -338,7 +343,7 @@ const DoctorDashboard = ({ onLogout }) => {
                       style={{
                         padding: "0.9rem 1.25rem",
                         fontSize: "0.8rem",
-                        color: "rgba(255,255,255,0.6)",
+                        color: "#7a9abf",
                       }}
                     >
                       {a.time}
@@ -481,9 +486,9 @@ const DoctorDashboard = ({ onLogout }) => {
                   background:
                     currentPage === i + 1
                       ? "#2dd4bf"
-                      : "rgba(255,255,255,0.08)",
+                      : "rgba(91,164,229,0.15)",
                   color:
-                    currentPage === i + 1 ? "#0a0f1e" : "rgba(255,255,255,0.5)",
+                    currentPage === i + 1 ? "#f0f7ff" : "#7a9abf",
                 }}
               >
                 {i + 1}
@@ -508,12 +513,12 @@ const DoctorDashboard = ({ onLogout }) => {
           >
             <div
               style={{
-                background: "#0d1321",
-                border: "1px solid rgba(255,255,255,0.1)",
+                background: "#ffffff",
+                border: "1px solid rgba(91,164,229,0.2)",
                 borderRadius: "1.5rem",
                 padding: "2rem",
                 width: "380px",
-                color: "white",
+                color: "#1e3a5f",
               }}
             >
               <h3
@@ -538,12 +543,12 @@ const DoctorDashboard = ({ onLogout }) => {
                     display: "flex",
                     justifyContent: "space-between",
                     padding: "0.6rem 0",
-                    borderBottom: "1px solid rgba(255,255,255,0.06)",
+                    borderBottom: "1px solid rgba(91,164,229,0.12)",
                   }}
                 >
                   <span
                     style={{
-                      color: "rgba(255,255,255,0.4)",
+                      color: "#7a9abf",
                       fontSize: "0.8rem",
                     }}
                   >
@@ -567,7 +572,7 @@ const DoctorDashboard = ({ onLogout }) => {
                   width: "100%",
                   padding: "0.75rem",
                   background: "#2dd4bf",
-                  color: "#0a0f1e",
+                  color: "#f0f7ff",
                   border: "none",
                   borderRadius: "0.75rem",
                   fontWeight: "700",
@@ -596,12 +601,12 @@ const DoctorDashboard = ({ onLogout }) => {
           >
             <div
               style={{
-                background: "#0d1321",
-                border: "1px solid rgba(255,255,255,0.1)",
+                background: "#ffffff",
+                border: "1px solid rgba(91,164,229,0.2)",
                 borderRadius: "1.5rem",
                 padding: "2rem",
                 width: "400px",
-                color: "white",
+                color: "#1e3a5f",
               }}
             >
               <h3
@@ -617,24 +622,24 @@ const DoctorDashboard = ({ onLogout }) => {
               <div
                 style={{
                   padding: "0.75rem",
-                  background: "rgba(255,255,255,0.04)",
+                  background: "#ffffff",
                   borderRadius: "0.75rem",
                   marginBottom: "1rem",
                 }}
               >
                 <p
-                  style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.4)" }}
+                  style={{ fontSize: "0.8rem", color: "#7a9abf" }}
                 >
                   Doctor Fee
                 </p>
                 <p style={{ fontWeight: "800", fontSize: "1.25rem" }}>
-                  ₹{selectedAppointment?.doctorFee || 500}
+                  ₹{selectedAppointment?.doctorFee || doctorFee}
                 </p>
               </div>
               <label
                 style={{
                   fontSize: "0.75rem",
-                  color: "rgba(255,255,255,0.4)",
+                  color: "#7a9abf",
                   display: "block",
                   marginBottom: "0.4rem",
                 }}
@@ -656,7 +661,7 @@ const DoctorDashboard = ({ onLogout }) => {
                 }}
               >
                 <p
-                  style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.4)" }}
+                  style={{ fontSize: "0.8rem", color: "#7a9abf" }}
                 >
                   Total
                 </p>
@@ -668,7 +673,7 @@ const DoctorDashboard = ({ onLogout }) => {
                   }}
                 >
                   ₹
-                  {(selectedAppointment?.doctorFee || 500) +
+                  {(selectedAppointment?.doctorFee || doctorFee) +
                     Number(otherCharges)}
                 </p>
               </div>
@@ -678,8 +683,8 @@ const DoctorDashboard = ({ onLogout }) => {
                   style={{
                     flex: 1,
                     padding: "0.75rem",
-                    background: "rgba(255,255,255,0.08)",
-                    color: "white",
+                    background: "rgba(91,164,229,0.15)",
+                    color: "#1e3a5f",
                     border: "none",
                     borderRadius: "0.75rem",
                     fontWeight: "600",
@@ -707,7 +712,7 @@ const DoctorDashboard = ({ onLogout }) => {
                     flex: 1,
                     padding: "0.75rem",
                     background: "#2dd4bf",
-                    color: "#0a0f1e",
+                    color: "#f0f7ff",
                     border: "none",
                     borderRadius: "0.75rem",
                     fontWeight: "700",

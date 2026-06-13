@@ -62,12 +62,12 @@ const App = () => {
     return (
       <div
         style={{
-          background: "#0a0f1e",
+          background: "#f0f7ff",
           minHeight: "100vh",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          color: "rgba(255,255,255,0.4)",
+          color: "#7a9abf",
           fontFamily: "'Segoe UI', system-ui",
         }}
       >

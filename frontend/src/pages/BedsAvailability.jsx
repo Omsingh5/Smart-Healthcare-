@@ -6,23 +6,23 @@ import { toast } from "react-toastify";
 const S = {
   page: {
     fontFamily: "'Segoe UI', system-ui, sans-serif",
-    color: "white",
+    color: "#1e3a5f",
     minHeight: "100vh",
     padding: "2rem",
-    background: "#0a0f1e",
+    background: "#f0f7ff",
   },
   card: {
-    background: "rgba(255,255,255,0.04)",
-    border: "1px solid rgba(255,255,255,0.08)",
+    background: "#ffffff",
+    border: "1px solid rgba(91,164,229,0.15)",
     borderRadius: "1.25rem",
     padding: "1.5rem",
   },
   input: {
-    background: "rgba(255,255,255,0.05)",
-    border: "1px solid rgba(255,255,255,0.1)",
+    background: "#f6f9fd",
+    border: "1px solid rgba(91,164,229,0.2)",
     borderRadius: "0.75rem",
     padding: "0.7rem 1rem",
-    color: "white",
+    color: "#1e3a5f",
     fontSize: "0.875rem",
     outline: "none",
     width: "140px",
@@ -30,14 +30,14 @@ const S = {
   label: {
     display: "block",
     fontSize: "0.7rem",
-    color: "rgba(255,255,255,0.4)",
+    color: "#7a9abf",
     textTransform: "uppercase",
     letterSpacing: "0.1em",
     marginBottom: "0.4rem",
   },
   btnPrimary: {
     background: "#2dd4bf",
-    color: "#0a0f1e",
+    color: "#f0f7ff",
     border: "none",
     borderRadius: "0.75rem",
     padding: "0.7rem 1.25rem",
@@ -141,13 +141,13 @@ const BedsAvailability = () => {
             style={{
               fontSize: "1.75rem",
               fontWeight: "900",
-              color: "white",
+              color: "#1e3a5f",
               marginBottom: "0.25rem",
             }}
           >
             Beds Availability
           </h1>
-          <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.875rem" }}>
+          <p style={{ color: "#7a9abf", fontSize: "0.875rem" }}>
             Manage hospital rooms and bed occupancy
           </p>
         </div>
@@ -188,7 +188,7 @@ const BedsAvailability = () => {
               style={{
                 fontWeight: "700",
                 fontSize: "0.875rem",
-                color: "rgba(255,255,255,0.5)",
+                color: "#7a9abf",
                 marginBottom: "1rem",
               }}
             >
@@ -212,15 +212,15 @@ const BedsAvailability = () => {
                     background:
                       selectedRoom === room._id
                         ? "#2dd4bf"
-                        : "rgba(255,255,255,0.06)",
+                        : "#f0f7ff",
                     color:
                       selectedRoom === room._id
-                        ? "#0a0f1e"
-                        : "rgba(255,255,255,0.7)",
+                        ? "#f0f7ff"
+                        : "#7a9abf",
                     border:
                       selectedRoom === room._id
                         ? "none"
-                        : "1px solid rgba(255,255,255,0.1)",
+                        : "1px solid rgba(91,164,229,0.2)",
                   }}
                 >
                   Room {room.number}
@@ -330,7 +330,7 @@ const BedsAvailability = () => {
                         borderRadius: "50%",
                         width: "20px",
                         height: "20px",
-                        color: "white",
+                        color: "#1e3a5f",
                         cursor: "pointer",
                         fontSize: "10px",
                       }}
@@ -348,7 +348,7 @@ const BedsAvailability = () => {
                         top: "calc(100% + 8px)",
                         left: 0,
                         width: "220px",
-                        background: "#0d1321",
+                        background: "#ffffff",
                         border: "1px solid rgba(255,255,255,0.15)",
                         borderRadius: "1rem",
                         padding: "1rem",
@@ -379,11 +379,11 @@ const BedsAvailability = () => {
                             display: "block",
                             width: "100%",
                             marginBottom: "0.5rem",
-                            background: "rgba(255,255,255,0.06)",
-                            border: "1px solid rgba(255,255,255,0.1)",
+                            background: "#f0f7ff",
+                            border: "1px solid rgba(91,164,229,0.2)",
                             borderRadius: "0.5rem",
                             padding: "0.5rem 0.75rem",
-                            color: "white",
+                            color: "#1e3a5f",
                             fontSize: "0.8rem",
                             outline: "none",
                           }}
@@ -431,12 +431,12 @@ const BedsAvailability = () => {
           >
             <div
               style={{
-                background: "#0d1321",
-                border: "1px solid rgba(255,255,255,0.1)",
+                background: "#ffffff",
+                border: "1px solid rgba(91,164,229,0.2)",
                 borderRadius: "1.5rem",
                 padding: "2rem",
                 width: "360px",
-                color: "white",
+                color: "#1e3a5f",
               }}
             >
               <h3
@@ -461,12 +461,12 @@ const BedsAvailability = () => {
                     display: "flex",
                     justifyContent: "space-between",
                     padding: "0.6rem 0",
-                    borderBottom: "1px solid rgba(255,255,255,0.06)",
+                    borderBottom: "1px solid rgba(91,164,229,0.1)",
                   }}
                 >
                   <span
                     style={{
-                      color: "rgba(255,255,255,0.4)",
+                      color: "#7a9abf",
                       fontSize: "0.8rem",
                     }}
                   >
@@ -484,7 +484,7 @@ const BedsAvailability = () => {
                   width: "100%",
                   padding: "0.75rem",
                   background: "#2dd4bf",
-                  color: "#0a0f1e",
+                  color: "#f0f7ff",
                   border: "none",
                   borderRadius: "0.75rem",
                   fontWeight: "700",

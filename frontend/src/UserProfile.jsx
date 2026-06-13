@@ -8,39 +8,39 @@ import Sidebar from "./components/Sidebar";
 const S = {
   page: {
     fontFamily: "'Segoe UI', system-ui, sans-serif",
-    color: "white",
+    color: "#1e3a5f",
     minHeight: "100vh",
     padding: "2rem",
-    background: "#0a0f1e",
+    background: "#f0f7ff",
   },
   card: {
-    background: "rgba(255,255,255,0.04)",
-    border: "1px solid rgba(255,255,255,0.08)",
+    background: "#ffffff",
+    border: "1px solid rgba(91,164,229,0.15)",
     borderRadius: "1.25rem",
     padding: "2rem",
   },
   label: {
     display: "block",
     fontSize: "0.7rem",
-    color: "rgba(255,255,255,0.4)",
+    color: "#7a9abf",
     textTransform: "uppercase",
     letterSpacing: "0.1em",
     marginBottom: "0.4rem",
   },
   input: (disabled) => ({
     width: "100%",
-    background: disabled ? "rgba(255,255,255,0.02)" : "rgba(255,255,255,0.06)",
-    border: `1px solid ${disabled ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.12)"}`,
+    background: disabled ? "rgba(255,255,255,0.02)" : "#f0f7ff",
+    border: `1px solid ${disabled ? "rgba(91,164,229,0.12)" : "rgba(91,164,229,0.25)"}`,
     borderRadius: "0.75rem",
     padding: "0.75rem 1rem",
-    color: disabled ? "rgba(255,255,255,0.4)" : "white",
+    color: disabled ? "#7a9abf" : "#1e3a5f",
     fontSize: "0.875rem",
     outline: "none",
     width: "100%",
   }),
   btnPrimary: {
     background: "#2dd4bf",
-    color: "#0a0f1e",
+    color: "#f0f7ff",
     border: "none",
     borderRadius: "0.75rem",
     padding: "0.75rem 2rem",
@@ -49,9 +49,9 @@ const S = {
     cursor: "pointer",
   },
   btnGhost: {
-    background: "rgba(255,255,255,0.06)",
-    color: "white",
-    border: "1px solid rgba(255,255,255,0.1)",
+    background: "#f0f7ff",
+    color: "#1e3a5f",
+    border: "1px solid rgba(91,164,229,0.2)",
     borderRadius: "0.75rem",
     padding: "0.75rem 2rem",
     fontWeight: "600",
@@ -139,12 +139,12 @@ const UserProfile = () => {
     return (
       <div
         style={{
-          background: "#0a0f1e",
+          background: "#f0f7ff",
           minHeight: "100vh",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          color: "rgba(255,255,255,0.4)",
+          color: "#7a9abf",
           fontFamily: "'Segoe UI', system-ui",
         }}
       >
@@ -156,12 +156,12 @@ const UserProfile = () => {
     return (
       <div
         style={{
-          background: "#0a0f1e",
+          background: "#f0f7ff",
           minHeight: "100vh",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          color: "rgba(255,255,255,0.4)",
+          color: "#7a9abf",
           fontFamily: "'Segoe UI', system-ui",
         }}
       >
@@ -198,13 +198,13 @@ const UserProfile = () => {
             style={{
               fontSize: "1.75rem",
               fontWeight: "900",
-              color: "white",
+              color: "#1e3a5f",
               marginBottom: "0.25rem",
             }}
           >
             My Profile
           </h1>
-          <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.875rem" }}>
+          <p style={{ color: "#7a9abf", fontSize: "0.875rem" }}>
             View and manage your personal information
           </p>
         </div>
@@ -233,7 +233,7 @@ const UserProfile = () => {
                 justifyContent: "center",
                 fontSize: "1.75rem",
                 fontWeight: "900",
-                color: "#0a0f1e",
+                color: "#f0f7ff",
               }}
             >
               {initials}
@@ -256,7 +256,7 @@ const UserProfile = () => {
               <p
                 style={{
                   fontSize: "0.75rem",
-                  color: "rgba(255,255,255,0.4)",
+                  color: "#7a9abf",
                   marginTop: "0.2rem",
                 }}
               >
@@ -317,7 +317,7 @@ const UserProfile = () => {
               style={{
                 width: "100%",
                 height: "1px",
-                background: "rgba(255,255,255,0.06)",
+                background: "#f0f7ff",
                 margin: "0.5rem 0",
               }}
             />
@@ -327,7 +327,7 @@ const UserProfile = () => {
                 <p
                   style={{
                     fontSize: "0.8rem",
-                    color: "rgba(255,255,255,0.5)",
+                    color: "#7a9abf",
                     marginBottom: "0.4rem",
                   }}
                 >
@@ -336,7 +336,7 @@ const UserProfile = () => {
               )}
               {form.address && (
                 <p
-                  style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.5)" }}
+                  style={{ fontSize: "0.8rem", color: "#7a9abf" }}
                 >
                   📍 {form.address}
                 </p>
@@ -402,16 +402,16 @@ const UserProfile = () => {
                     cursor: editMode ? "pointer" : "default",
                   }}
                 >
-                  <option value="" style={{ background: "#0a0f1e" }}>
+                  <option value="" style={{ background: "#f0f7ff" }}>
                     Select
                   </option>
-                  <option value="Male" style={{ background: "#0a0f1e" }}>
+                  <option value="Male" style={{ background: "#f0f7ff" }}>
                     Male
                   </option>
-                  <option value="Female" style={{ background: "#0a0f1e" }}>
+                  <option value="Female" style={{ background: "#f0f7ff" }}>
                     Female
                   </option>
-                  <option value="Other" style={{ background: "#0a0f1e" }}>
+                  <option value="Other" style={{ background: "#f0f7ff" }}>
                     Other
                   </option>
                 </select>
@@ -429,7 +429,7 @@ const UserProfile = () => {
                     cursor: editMode ? "pointer" : "default",
                   }}
                 >
-                  <option value="" style={{ background: "#0a0f1e" }}>
+                  <option value="" style={{ background: "#f0f7ff" }}>
                     Select
                   </option>
                   {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map(
@@ -437,7 +437,7 @@ const UserProfile = () => {
                       <option
                         key={g}
                         value={g}
-                        style={{ background: "#0a0f1e" }}
+                        style={{ background: "#f0f7ff" }}
                       >
                         {g}
                       </option>
