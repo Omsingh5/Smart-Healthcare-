@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:5000", // or use environment variable if deployed
+  baseURL: "https://smart-healthcare-0de1.onrender.com", // or use environment variable if deployed
 });
 
 // ✅ Request Interceptor – Attach token

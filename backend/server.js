@@ -15,7 +15,7 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-const allowedOrigins = ['http://localhost:5000', 'http://localhost:5173', 'https://smarthealth-care.netlify.app'];
+const allowedOrigins = ['https://smarthealth-care.netlify.app'];
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {

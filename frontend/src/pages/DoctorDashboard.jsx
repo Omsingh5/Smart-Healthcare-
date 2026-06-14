@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import { Eye, CheckCircle, XCircle, CalendarDays } from "lucide-react";
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:5000");
+const socket = io("https://smart-healthcare-0de1.onrender.com");
 
 const S = {
   page: {
@@ -83,9 +83,12 @@ const DoctorDashboard = ({ onLogout }) => {
   useEffect(() => {
     fetchAppointments();
     // Fetch the doctor's own fee
-    axiosInstance.get("/api/auth/me").then(res => {
-      setDoctorFee(res.data.user?.fee || 500);
-    }).catch(() => {});
+    axiosInstance
+      .get("/api/auth/me")
+      .then((res) => {
+        setDoctorFee(res.data.user?.fee || 500);
+      })
+      .catch(() => {});
   }, []);
 
   const fetchAppointments = async () => {
@@ -115,7 +118,7 @@ const DoctorDashboard = ({ onLogout }) => {
   const handleGenerateBill = async (appointmentId) => {
     try {
       const response = await axiosInstance.get(
-        `http://localhost:5000/api/invoice/${appointmentId}`,
+        `https://smart-healthcare-0de1.onrender.com/api/invoice/${appointmentId}`,
         { responseType: "blob" },
       );
       const link = document.createElement("a");
@@ -197,9 +200,7 @@ const DoctorDashboard = ({ onLogout }) => {
                     ? "1px solid rgba(45,212,191,0.4)"
                     : "1px solid rgba(91,164,229,0.15)",
                 background:
-                  statusFilter === key
-                    ? "rgba(45,212,191,0.08)"
-                    : "#ffffff",
+                  statusFilter === key ? "rgba(45,212,191,0.08)" : "#ffffff",
                 transition: "all 0.2s",
                 textAlign: "left",
               }}
@@ -308,8 +309,7 @@ const DoctorDashboard = ({ onLogout }) => {
                     key={a._id}
                     style={{
                       borderBottom: "1px solid rgba(91,164,229,0.08)",
-                      background:
-                        i % 2 === 0 ? "transparent" : "#fafcff",
+                      background: i % 2 === 0 ? "transparent" : "#fafcff",
                       transition: "background 0.15s",
                     }}
                     onMouseEnter={(e) =>
@@ -484,11 +484,8 @@ const DoctorDashboard = ({ onLogout }) => {
                   fontSize: "0.8rem",
                   fontWeight: "600",
                   background:
-                    currentPage === i + 1
-                      ? "#2dd4bf"
-                      : "rgba(91,164,229,0.15)",
-                  color:
-                    currentPage === i + 1 ? "#f0f7ff" : "#7a9abf",
+                    currentPage === i + 1 ? "#2dd4bf" : "rgba(91,164,229,0.15)",
+                  color: currentPage === i + 1 ? "#f0f7ff" : "#7a9abf",
                 }}
               >
                 {i + 1}
@@ -627,9 +624,7 @@ const DoctorDashboard = ({ onLogout }) => {
                   marginBottom: "1rem",
                 }}
               >
-                <p
-                  style={{ fontSize: "0.8rem", color: "#7a9abf" }}
-                >
+                <p style={{ fontSize: "0.8rem", color: "#7a9abf" }}>
                   Doctor Fee
                 </p>
                 <p style={{ fontWeight: "800", fontSize: "1.25rem" }}>
@@ -660,11 +655,7 @@ const DoctorDashboard = ({ onLogout }) => {
                   marginBottom: "1.5rem",
                 }}
               >
-                <p
-                  style={{ fontSize: "0.8rem", color: "#7a9abf" }}
-                >
-                  Total
-                </p>
+                <p style={{ fontSize: "0.8rem", color: "#7a9abf" }}>Total</p>
                 <p
                   style={{
                     fontWeight: "800",

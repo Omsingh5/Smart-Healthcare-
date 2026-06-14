@@ -42,7 +42,7 @@ const PatientDashboard = ({ onLogout }) => {
   const socketRef = useRef(null);
 
   useEffect(() => {
-    socketRef.current = io("http://localhost:5000");
+    socketRef.current = io("https://smart-healthcare-0de1.onrender.com");
     fetchData();
 
     socketRef.current.on("appointmentUpdated", fetchData);
@@ -71,7 +71,7 @@ const PatientDashboard = ({ onLogout }) => {
 
   useEffect(() => {
     // 1. Initialize the socket connection
-    const socket = io("http://localhost:5000");
+    const socket = io("https://smart-healthcare-0de1.onrender.com");
 
     // 2. Fetch data initially
     fetchData();
