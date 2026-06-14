@@ -12,6 +12,7 @@
     "@react-pdf/renderer": "^4.5.1",
     "apexcharts": "^4.5.0",
     "axios": "^1.6.2",
+    "buffer": "^6.0.3",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.6.3",
     "lucide-react": "^0.487.0",
