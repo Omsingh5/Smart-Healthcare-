@@ -7,7 +7,8 @@ const Login = ({ setUser }) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
-
+  const [invoiceData, setInvoiceData] = useState(null);
+  const [downloadingId, setDownloadingId] = useState(null);
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -50,7 +51,9 @@ const Login = ({ setUser }) => {
         <div className="text-center mb-8">
           <div className="text-4xl mb-2">🏥</div>
           <h2 className="text-3xl font-bold text-indigo-700">Welcome Back</h2>
-          <p className="text-gray-500 text-sm mt-1">Sign in to Smart Health Care</p>
+          <p className="text-gray-500 text-sm mt-1">
+            Sign in to Smart Health Care
+          </p>
         </div>
 
         {/* Form */}

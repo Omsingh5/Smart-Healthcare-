@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || "http://localhost:5000", // fallback for dev
+  baseURL: process.env.REACT_APP_API_URL || "https://my-backend.onrender.com", // fallback for dev
   withCredentials: true, // allow sending cookies if you use them
 });
 

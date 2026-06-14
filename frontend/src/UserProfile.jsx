@@ -36,7 +36,6 @@ const S = {
     color: disabled ? "#7a9abf" : "#1e3a5f",
     fontSize: "0.875rem",
     outline: "none",
-    width: "100%",
   }),
   btnPrimary: {
     background: "#2dd4bf",
@@ -335,9 +334,7 @@ const UserProfile = () => {
                 </p>
               )}
               {form.address && (
-                <p
-                  style={{ fontSize: "0.8rem", color: "#7a9abf" }}
-                >
+                <p style={{ fontSize: "0.8rem", color: "#7a9abf" }}>
                   📍 {form.address}
                 </p>
               )}

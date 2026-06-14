@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from "react";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import { InvoicePDF } from "../components/InvoicePDF";
+import React, { useEffect, useState, useRef } from "react";
 import axiosInstance from "../utils/axiosInstance";
 import Sidebar from "../components/Sidebar";
 import { motion } from "framer-motion";
@@ -12,73 +14,6 @@ import {
 } from "lucide-react";
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:5000");
-
-const S = {
-  page: {
-    fontFamily: "'Segoe UI', system-ui, sans-serif",
-    color: "#1e3a5f",
-    minHeight: "100vh",
-    padding: "2rem",
-    background: "#f0f7ff",
-  },
-  card: {
-    background: "#ffffff",
-    border: "1px solid rgba(91,164,229,0.15)",
-    borderRadius: "1.25rem",
-    padding: "1.5rem",
-  },
-  input: {
-    width: "100%",
-    background: "#f6f9fd",
-    border: "1px solid rgba(91,164,229,0.2)",
-    borderRadius: "0.75rem",
-    padding: "0.75rem 1rem",
-    color: "#1e3a5f",
-    fontSize: "0.875rem",
-    outline: "none",
-  },
-  label: {
-    display: "block",
-    fontSize: "0.7rem",
-    color: "#7a9abf",
-    textTransform: "uppercase",
-    letterSpacing: "0.1em",
-    marginBottom: "0.4rem",
-  },
-  btnPrimary: {
-    background: "#2dd4bf",
-    color: "#f0f7ff",
-    border: "none",
-    borderRadius: "0.75rem",
-    padding: "0.75rem 1.5rem",
-    fontWeight: "700",
-    fontSize: "0.875rem",
-    cursor: "pointer",
-  },
-  btnSecondary: {
-    background: "#f0f7ff",
-    color: "#1e3a5f",
-    border: "1px solid rgba(91,164,229,0.2)",
-    borderRadius: "0.75rem",
-    padding: "0.5rem 1rem",
-    fontSize: "0.8rem",
-    cursor: "pointer",
-  },
-  badge: (color) => ({
-    display: "inline-flex",
-    alignItems: "center",
-    gap: "0.3rem",
-    padding: "0.25rem 0.75rem",
-    borderRadius: "999px",
-    fontSize: "0.75rem",
-    fontWeight: "600",
-    background: `${color}20`,
-    color: color,
-    border: `1px solid ${color}40`,
-  }),
-};
-
 const PatientDashboard = ({ onLogout }) => {
   const [appointments, setAppointments] = useState([]);
   const [doctors, setDoctors] = useState([]);
@@ -88,7 +23,36 @@ const PatientDashboard = ({ onLogout }) => {
     time: "",
     notes: "",
   });
+  const [invoiceData, setInvoiceData] = useState(null);
+  const [downloadingId, setDownloadingId] = useState(null);
   const [loading, setLoading] = useState(true);
+  const handlePreparePDF = async (appointmentId) => {
+    console.log(`Requesting URL: /api/invoice-data/${appointmentId}`);
+    setDownloadingId(appointmentId);
+    try {
+      const res = await axiosInstance.get(`/api/invoice-data/${appointmentId}`);
+      setInvoiceData(res.data);
+    } catch (err) {
+      console.error("Failed to load invoice data", err);
+    } finally {
+      setDownloadingId(null);
+    }
+  };
+  // At the top of your component
+  const socketRef = useRef(null);
+
+  useEffect(() => {
+    socketRef.current = io("http://localhost:5000");
+    fetchData();
+
+    socketRef.current.on("appointmentUpdated", fetchData);
+
+    return () => {
+      socketRef.current.disconnect();
+    };
+  }, []);
+
+  // Then use socketRef.current whenever you need it!
 
   const fetchData = async () => {
     try {
@@ -106,10 +70,86 @@ const PatientDashboard = ({ onLogout }) => {
   };
 
   useEffect(() => {
+    // 1. Initialize the socket connection
+    const socket = io("http://localhost:5000");
+
+    // 2. Fetch data initially
     fetchData();
+
+    // 3. Set up the event listener
     socket.on("appointmentUpdated", fetchData);
-    return () => socket.off("appointmentUpdated");
+
+    // 4. Cleanup function to disconnect when the component unmounts
+    return () => {
+      socket.off("appointmentUpdated");
+      socket.disconnect();
+    };
   }, []);
+
+  const S = {
+    page: {
+      fontFamily: "'Segoe UI', system-ui, sans-serif",
+      color: "#1e3a5f",
+      minHeight: "100vh",
+      padding: "2rem",
+      background: "#f0f7ff",
+    },
+    card: {
+      background: "#ffffff",
+      border: "1px solid rgba(91,164,229,0.15)",
+      borderRadius: "1.25rem",
+      padding: "1.5rem",
+    },
+    input: {
+      width: "100%",
+      background: "#f6f9fd",
+      border: "1px solid rgba(91,164,229,0.2)",
+      borderRadius: "0.75rem",
+      padding: "0.75rem 1rem",
+      color: "#1e3a5f",
+      fontSize: "0.875rem",
+      outline: "none",
+    },
+    label: {
+      display: "block",
+      fontSize: "0.7rem",
+      color: "#7a9abf",
+      textTransform: "uppercase",
+      letterSpacing: "0.1em",
+      marginBottom: "0.4rem",
+    },
+    btnPrimary: {
+      background: "#2dd4bf",
+      color: "#f0f7ff",
+      border: "none",
+      borderRadius: "0.75rem",
+      padding: "0.75rem 1.5rem",
+      fontWeight: "700",
+      fontSize: "0.875rem",
+      cursor: "pointer",
+    },
+    btnSecondary: {
+      background: "#f0f7ff",
+      color: "#1e3a5f",
+      border: "1px solid rgba(91,164,229,0.2)",
+      borderRadius: "0.75rem",
+      padding: "0.5rem 1rem",
+      fontSize: "0.8rem",
+      cursor: "pointer",
+    },
+    badge: (color) => ({
+      display: "inline-flex",
+      alignItems: "center",
+      gap: "0.3rem",
+      padding: "0.25rem 0.75rem",
+      borderRadius: "999px",
+      fontSize: "0.75rem",
+      fontWeight: "600",
+      background: `${color}20`,
+      color: color,
+      border: `1px solid ${color}40`,
+    }),
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -127,37 +167,54 @@ const PatientDashboard = ({ onLogout }) => {
 
   const handlePayment = async (appointment) => {
     try {
-      const res = await axiosInstance.post("/api/payment/create-order", {
+      if (!window.Razorpay) {
+        toast.error("Payment gateway failed to load.");
+        return;
+      }
+
+      // Pass the appointment ID so the server can fetch the correct totalAmount
+      const { data } = await axiosInstance.post("/api/payment/create-order", {
         appointmentId: appointment._id,
       });
-      const { key, order } = res.data;
+
       const options = {
-        key,
-        amount: order.amount,
-        currency: order.currency,
-        name: "Smart Health Care",
-        description: "Appointment Bill",
-        order_id: order.id,
+        key: data.key,
+        amount: data.order.amount,
+        currency: "INR",
+        name: "Smart Healthcare",
+        order_id: data.order.id,
         handler: async function (response) {
-          toast.success("Payment successful!");
-          await axiosInstance.put(
-            `/api/patient/payment-success/${appointment._id}`,
-            { paymentId: response.razorpay_payment_id },
-          );
-          fetchData();
+          try {
+            await axiosInstance.put(
+              `/api/patient/payment-success/${appointment._id}`,
+              {
+                paymentId: response.razorpay_payment_id,
+              },
+            );
+            toast.success("Payment Successful!");
+            fetchData(); // Refresh list
+          } catch (err) {
+            toast.error("Payment verified but status update failed");
+          }
         },
-        prefill: { name: appointment.patientName },
         theme: { color: "#2dd4bf" },
       };
+
       const rzp = new window.Razorpay(options);
       rzp.open();
     } catch (err) {
-      toast.error("Payment failed to start");
+      console.error("Payment Error:", err.response?.data || err.message);
+      toast.error(
+        "Could not start payment. Please ensure the doctor has checked you up.",
+      );
     }
   };
 
   const now = new Date();
   const upcoming = appointments.filter((a) => {
+    // If it's already checked up, it's NOT upcoming anymore
+    if (a.checkedUp) return false;
+
     if (a.status === "pending") return true;
     if (a.status === "approved") {
       const updated = a.updatedAt ? new Date(a.updatedAt) : new Date(a.date);
@@ -165,6 +222,8 @@ const PatientDashboard = ({ onLogout }) => {
     }
     return false;
   });
+
+  // Everything that isn't upcoming is history
   const history = appointments.filter((a) => !upcoming.includes(a));
 
   const statusBadge = (a) => {
@@ -451,42 +510,47 @@ const PatientDashboard = ({ onLogout }) => {
                             Total: ₹{a.totalAmount} · Payment: {a.paymentStatus}
                           </p>
                           <div className="flex gap-2 mt-2 flex-wrap">
-                            <button
-                              style={S.btnSecondary}
-                              onClick={async () => {
-                                try {
-                                  const token = localStorage.getItem("token");
-                                  const response = await fetch(
-                                    `http://localhost:5000/api/invoice/${a._id}`,
-                                    { headers: { Authorization: `Bearer ${token}` } }
-                                  );
-                                  if (!response.ok) throw new Error("Failed");
-                                  const blob = await response.blob();
-                                  const url = window.URL.createObjectURL(blob);
-                                  const link = document.createElement("a");
-                                  link.href = url;
-                                  link.download = `invoice-${a._id}.pdf`;
-                                  link.click();
-                                  window.URL.revokeObjectURL(url);
-                                } catch {
-                                  toast.error("Could not download invoice");
-                                }
-                              }}
-                            >
-                              📄 Download Invoice
-                            </button>
-                            {a.paymentStatus === "unpaid" && (
-                              <button
-                                onClick={() => handlePayment(a)}
-                                style={{
-                                  ...S.btnPrimary,
-                                  padding: "0.4rem 1rem",
-                                  fontSize: "0.8rem",
-                                }}
-                              >
-                                💳 Pay Now
-                              </button>
-                            )}
+                            <div className="flex flex-col gap-2">
+                              {invoiceData && invoiceData._id === a._id ? (
+                                <PDFDownloadLink
+                                  document={<InvoicePDF data={invoiceData} />}
+                                  fileName={`invoice-${a._id}.pdf`}
+                                  style={S.btnPrimary}
+                                >
+                                  {({ loading }) =>
+                                    loading
+                                      ? "Generating..."
+                                      : "⬇️ Download PDF"
+                                  }
+                                </PDFDownloadLink>
+                              ) : (
+                                <button
+                                  style={S.btnSecondary}
+                                  onClick={() => handlePreparePDF(a._id)}
+                                  disabled={downloadingId === a._id}
+                                >
+                                  {downloadingId === a._id
+                                    ? "Loading..."
+                                    : "📄 Prepare PDF"}
+                                </button>
+                              )}
+                            </div>
+
+                            {a.checkedUp &&
+                              (!a.paymentStatus ||
+                                a.paymentStatus === "unpaid") && (
+                                <button
+                                  onClick={() => handlePayment(a)}
+                                  style={{
+                                    ...S.btnPrimary,
+                                    padding: "0.4rem 1rem",
+                                    fontSize: "0.8rem",
+                                    marginTop: "10px",
+                                  }}
+                                >
+                                  💳 Pay Now
+                                </button>
+                              )}
                           </div>
                         </div>
                       )}

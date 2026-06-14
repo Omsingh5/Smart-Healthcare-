@@ -15,7 +15,7 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-const allowedOrigins = ['http://localhost:5000', 'http://localhost:5173'];
+const allowedOrigins = ['http://localhost:5000', 'http://localhost:5173', 'https://smarthealth-care.netlify.app'];
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
@@ -442,15 +442,19 @@ app.put("/api/doctor/appointments/:id/checked-up", authenticateToken, isDoctor, 
     if (!appointment) return res.status(404).json({ message: "Appointment not found" });
 
     const doctor = await User.findById(appointment.doctor_id);
-    const total = doctor.fee + (req.body.otherCharges || 0);
+    const total = (doctor.fee || 500) + (req.body.otherCharges || 0);
 
     appointment.checkedUp = true;
     appointment.otherCharges = req.body.otherCharges || 0;
     appointment.totalAmount = total;
-    appointment.paymentStatus = 'unpaid'; // Initial status
-    appointment.paymentTime = new Date(); // <- add this
+    appointment.paymentStatus = 'unpaid';
+    appointment.paymentTime = new Date();
 
     await appointment.save();
+
+    // TRIGGER THIS: This tells the frontend to update the list immediately
+    const io = req.app.get('io');
+    io.emit("appointmentUpdated", appointment); 
 
     res.json({ success: true, appointment });
   } catch (err) {
@@ -467,8 +471,7 @@ app.put("/api/doctor/appointments/:id/skip", authenticateToken, isDoctor, async 
   }
 });
 
-// Generate Invoice (Bill)
-app.get("/api/invoice/:id", authenticateToken, async (req, res) => {
+app.get("/api/invoice-data/:id", authenticateToken, async (req, res) => {
   try {
     const appointment = await Appointment.findById(req.params.id)
       .populate("doctor_id", "name specialization fee")
@@ -476,43 +479,10 @@ app.get("/api/invoice/:id", authenticateToken, async (req, res) => {
 
     if (!appointment) return res.status(404).send("Appointment not found");
 
-    const doc = new PDFDocument();
-    res.setHeader("Content-Disposition", `attachment; filename=invoice-${appointment._id}.pdf`);
-    res.setHeader("Content-Type", "application/pdf");
-
-    doc.pipe(res);
-
-    // Add contents to the invoice
-    doc.fontSize(20).text("Medical Invoice", { align: "center" });
-    doc.moveDown();
-
-    doc.fontSize(12).text(`Appointment ID: ${appointment._id}`);
-    doc.text(`Date: ${new Date(appointment.date).toLocaleDateString()}`);
-    doc.text(`Time: ${appointment.time}`);
-    doc.moveDown();
-
-    doc.fontSize(14).text("Patient Details:");
-    doc.fontSize(12).text(`Name: ${appointment.patient_id.name}`);
-    doc.text(`Age: ${appointment.patient_id.age}`);
-    doc.text(`Contact: ${appointment.patient_id.contact}`);
-    doc.moveDown();
-
-    doc.fontSize(14).text("Doctor Details:");
-    doc.fontSize(12).text(`Name: ${appointment.doctor_id.name}`);
-    doc.text(`Specialization: ${appointment.doctor_id.specialization}`);
-    doc.text(`Consultation Fee: ₹${appointment.doctor_id.fee}`);
-    doc.moveDown();
-
-    doc.fontSize(14).text("Billing Summary:");
-    doc.fontSize(12).text(`Other Charges: ₹${appointment.otherCharges}`);
-    doc.text(`Total Amount: ₹${appointment.totalAmount}`);
-    doc.text(`Status: ${appointment.paymentStatus}`);
-    doc.text(`Generated At: ${new Date().toLocaleString()}`);
-
-    doc.end();
+    res.json(appointment);
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Invoice generation failed");
+    console.error("Backend Error:", err);
+    res.status(500).send("Failed to fetch data");
   }
 });
 
@@ -590,6 +560,7 @@ app.put("/api/patient/payment-success/:id", authenticateToken, async (req, res) 
     res.status(500).json({ message: "Payment status update failed", error: err.message });
   }
 });
+
 
 
 app.put('/api/auth/me', authenticateToken, async (req, res) => {
